@@ -6,6 +6,8 @@ import uuid
 
 import numpy.testing as npt
 import pytest
+import timm
+import transformers
 from omegaconf import OmegaConf
 from torch import nn
 
@@ -31,8 +33,8 @@ from autogluon.multimodal.constants import (
 from autogluon.multimodal.utils import modify_duplicate_model_names
 from autogluon.multimodal.utils.misc import shopee_dataset
 
-from ..others.unittest_datasets import AEDataset, HatefulMeMesDataset, PetFinderDataset
-from ..others.utils import get_home_dir
+from ..utils.unittest_datasets import AEDataset, HatefulMeMesDataset, PetFinderDataset
+from ..utils.utils import get_home_dir
 
 ALL_DATASETS = {
     "petfinder": PetFinderDataset(),
@@ -93,7 +95,7 @@ def verify_realtime_inference(predictor, df, verify_embedding=True):
         (
             "petfinder",
             ["numerical_mlp", "categorical_mlp", "timm_image", "hf_text", "clip", "fusion_mlp"],
-            "prajjwal1/bert-tiny",
+            "nlpaueb/legal-bert-small-uncased",
             "swin_tiny_patch4_window7_224",
             GREEDY_SOUP,
             LORA,
@@ -138,7 +140,7 @@ def verify_realtime_inference(predictor, df, verify_embedding=True):
         (
             "petfinder",
             ["numerical_mlp", "categorical_mlp", "hf_text", "fusion_mlp"],
-            "prajjwal1/bert-tiny",
+            "nlpaueb/legal-bert-small-uncased",
             None,
             UNIFORM_SOUP,
             None,
@@ -165,11 +167,20 @@ def verify_realtime_inference(predictor, df, verify_embedding=True):
         (
             "ae",
             ["hf_text"],
-            "prajjwal1/bert-tiny",
+            "nlpaueb/legal-bert-small-uncased",
             None,
             BEST,
             LORA_BIAS,
             "bcewithlogitsloss",
+        ),
+        (
+            "ae",
+            ["hf_text"],
+            "CLTL/MedRoBERTa.nl",
+            None,
+            BEST,
+            None,
+            "auto",
         ),
         (
             "hateful_memes",
@@ -281,7 +292,7 @@ def test_standalone():  # test standalone feature in MultiModalPredictor.save()
     hyperparameters = {
         "optimization.max_epochs": 1,
         "model.names": ["numerical_mlp", "categorical_mlp", "timm_image", "hf_text", "clip", "fusion_mlp", "t_few"],
-        "model.hf_text.checkpoint_name": "prajjwal1/bert-tiny",
+        "model.hf_text.checkpoint_name": "nlpaueb/legal-bert-small-uncased",
         "model.timm_image.checkpoint_name": "swin_tiny_patch4_window7_224",
         "model.t_few.checkpoint_name": "t5-small",
         "env.num_workers": 0,
@@ -344,13 +355,13 @@ def test_standalone():  # test standalone feature in MultiModalPredictor.save()
         {
             "model.names": ["hf_text_abc", "hf_text_def", "hf_text_xyz", "fusion_mlp_123"],
             "model.hf_text_def.checkpoint_name": "monsoon-nlp/hindi-bert",
-            "model.hf_text_xyz.checkpoint_name": "prajjwal1/bert-tiny",
+            "model.hf_text_xyz.checkpoint_name": "nlpaueb/legal-bert-small-uncased",
             "model.hf_text_abc.checkpoint_name": "sentence-transformers/all-MiniLM-L6-v2",
         },
         {
             "model.names": ["timm_image_haha", "hf_text_hello", "numerical_mlp_456", "fusion_mlp"],
             "model.timm_image_haha.checkpoint_name": "swin_tiny_patch4_window7_224",
-            "model.hf_text_hello.checkpoint_name": "prajjwal1/bert-tiny",
+            "model.hf_text_hello.checkpoint_name": "nlpaueb/legal-bert-small-uncased",
             "data.numerical.convert_to_text": False,
         },
     ],
@@ -586,7 +597,7 @@ def test_modifying_duplicate_model_names():
     hyperparameters = {
         "optimization.max_epochs": 1,
         "model.names": ["numerical_mlp", "categorical_mlp", "timm_image", "hf_text", "fusion_mlp"],
-        "model.hf_text.checkpoint_name": "prajjwal1/bert-tiny",
+        "model.hf_text.checkpoint_name": "nlpaueb/legal-bert-small-uncased",
         "model.timm_image.checkpoint_name": "swin_tiny_patch4_window7_224",
         "env.num_workers": 0,
         "env.num_workers_evaluation": 0,

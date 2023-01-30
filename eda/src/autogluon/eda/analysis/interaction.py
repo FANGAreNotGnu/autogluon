@@ -104,7 +104,7 @@ class Correlation(AbstractAnalysis):
             if self.method == "phik":
                 state.correlations[ds] = df.phik_matrix(**self.args, verbose=False)
             else:
-                state.correlations[ds] = df.corr(method=self.method, **self.args)
+                state.correlations[ds] = df.corr(method=self.method, numeric_only=True, **self.args)
 
             if self.focus_field is not None and self.focus_field in state.correlations[ds].columns:
                 state.correlations_focus_field = self.focus_field
@@ -514,7 +514,9 @@ class FeatureDistanceAnalysis(AbstractAnalysis):
         return self.all_keys_must_be_present(args, "train_data", "label", "feature_generator")
 
     def _fit(self, state: AnalysisState, args: AnalysisState, **fit_kwargs) -> None:
-        x = args.train_data.drop(labels=[args.label], axis=1)
+        x = args.train_data
+        if args.label is not None:
+            x = x.drop(labels=[args.label], axis=1)
         corr = np.round(spearmanr(x).correlation, 4)
         np.fill_diagonal(corr, 1)
         corr_condensed = hc.distance.squareform(1 - np.nan_to_num(corr))
