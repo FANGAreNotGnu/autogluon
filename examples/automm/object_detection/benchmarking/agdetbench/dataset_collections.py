@@ -197,7 +197,18 @@ SHORTCUT_LAUNCH = {
     "wf": widerface,  #
 }
 
+def launch_dataset(key, data_root):
+    if key in LAUNCH:
+        return LAUNCH[key](data_root=data_root)
+    elif key in SHORTCUT_LAUNCH:
+        return SHORTCUT_LAUNCH[key](data_root=data_root)
+    else:
+        raise ValueError(f"Dataset Key Error: {key}")
+
 if __name__ == "__main__":
-    for Dataset in list(LAUNCH.values())[20:]:
-        dataset = Dataset("/media/code/datasets/AGDetBench")
-        dataset.print_table()
+    #for Dataset in list(LAUNCH.values())[20:]:
+    #for Dataset in [LAUNCH["widerface"]]:
+    #    dataset = Dataset("/media/code/datasets/AGDetBench")
+    #    dataset.print_table()
+    for k in LAUNCH:
+        print(k)

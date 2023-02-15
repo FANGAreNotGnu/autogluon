@@ -326,7 +326,7 @@ def object_detection(presets: str = DEFAULT):
         hyperparameters.update(default_tunable_hyperparameters)
         hyperparameter_tune_kwargs.update(default_hyperparameter_tune_kwargs)
 
-    if presets in [DEFAULT, MEDIUM_QUALITY]:
+    if presets == MEDIUM_QUALITY:
         hyperparameters.update(
             {
                 "optimization.max_epochs": 30,
@@ -336,7 +336,7 @@ def object_detection(presets: str = DEFAULT):
                 "optimization.check_val_every_n_epoch": 3,
             }
         )
-    elif presets == HIGH_QUALITY:
+    elif presets in [DEFAULT, HIGH_QUALITY]:
         hyperparameters.update(
             {
                 "model.mmdet_image.checkpoint_name": "yolox_l_8x8_300e_coco",
@@ -344,7 +344,7 @@ def object_detection(presets: str = DEFAULT):
                 "optimization.learning_rate": 5e-5,
                 "optimization.lr_decay": 0.95,
                 "optimization.patience": 3,
-                "optimization.max_epochs": 30,
+                "optimization.max_epochs": 50,
                 "optimization.val_check_interval": 1.0,
                 "optimization.check_val_every_n_epoch": 3,
             }

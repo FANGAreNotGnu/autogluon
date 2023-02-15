@@ -29,7 +29,7 @@ class AGDetBenchBaseDataset:
 
         self.paths = {
             "train": self.train_path,
-            "val": self.train_path,
+            "val": self.val_path,
             "trainval": self.trainval_path,
             "test": self.test_path,
             "traintest": self.traintest_path,
@@ -111,9 +111,6 @@ class AGDetBenchBaseDataset:
                 to_print += ", "
             to_print = to_print[:-2] + "]"
             print(to_print)
-
-
-
 
 
 if __name__ == "__main__":
