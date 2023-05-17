@@ -160,6 +160,7 @@ class MMDetAutoModelForObjectDetection(nn.Module):
 
         self.name_to_id = self.get_layer_ids()
         self.head_layer_names = [n for n, layer_id in self.name_to_id.items() if layer_id <= 0]
+        self.backbone_layer_names = self.get_backbone_layer_names()
 
     def set_data_preprocessor_device(self):
         if not self.device:
@@ -415,6 +416,18 @@ class MMDetAutoModelForObjectDetection(nn.Module):
             name_to_id = self.get_yolox_layer_ids()
 
         return name_to_id
+
+    def get_backbone_layer_names(self):
+        backbone_layer_names = []
+        backbone_layers_patterns = [
+            "backbone",
+            "encoder",
+        ]
+        for n, _ in self.named_parameters():
+            for pattern in backbone_layers_patterns:
+                if pattern in n:
+                    backbone_layer_names.append(n)
+        return backbone_layer_names
 
     def get_yolox_layer_ids(self):
         # logic not straight forward, need to print out the model to understand

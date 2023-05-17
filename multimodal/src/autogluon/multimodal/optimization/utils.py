@@ -628,6 +628,73 @@ def get_trainable_params_efficient_finetune(
     return trainable_param_names
 
 
+def apply_freeze_backbone_lr(
+    model: nn.Module,
+    lr: float,
+    weight_decay: float,
+    return_params: Optional[bool] = True,
+):
+    """
+    Set up the pretrained backbone to be frozen.
+    Head layers use the normal learning rate (lr).
+    Layer normalization parameters and other layers' bias parameters don't use weight decay.
+
+    Parameters
+    ----------
+    model
+        A Pytorch model.
+    lr
+        The learning rate.
+    lr_mult
+        The multiplier (0, 1) to scale down the learning rate.
+    weight_decay
+        Weight decay.
+    return_params
+        return_params
+        Whether to return parameters or their names. If you want to double-check
+        whether the learning rate setup is as expected, you can set "return_params=False",
+        and print the layer names along with their learning rates through
+        "print("Param groups = %s" % json.dumps(optimizer_grouped_parameters, indent=2))".
+
+    Returns
+    -------
+    The grouped parameters or their names.
+    """
+    decay_param_names = get_weight_decay_param_names(model)
+
+    if hasattr(model, "backbone_layer_names"):
+        is_nonfrozen_layer = lambda n: not any(bb in n for bb in model.backbone_layer_names)
+    else:  # freeze all non-head layers if backbone layers are not specified
+        is_nonfrozen_layer = lambda n: any(bb in n for bb in model.head_layer_names)
+
+    optimizer_grouped_parameters = [
+        {
+            "params": [
+                p if return_params else n
+                for n, p in model.named_parameters()
+                if n in decay_param_names and is_nonfrozen_layer(n)
+            ],
+            "weight_decay": weight_decay,
+            "lr": lr,
+        },
+        {
+            "params": [
+                p if return_params else n
+                for n, p in model.named_parameters()
+                if n not in decay_param_names and is_nonfrozen_layer(n)
+            ],
+            "weight_decay": 0.0,
+            "lr": lr,
+        },
+    ]
+
+    for n, p in model.named_parameters():
+        if not is_nonfrozen_layer(n):
+            p.requires_grad = False
+
+    return optimizer_grouped_parameters
+
+
 def apply_layerwise_lr_decay(
     model: nn.Module,
     lr: float,
