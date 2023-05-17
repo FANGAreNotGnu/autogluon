@@ -1721,7 +1721,7 @@ class MultiModalPredictor(ExportMixin):
         )
 
         callbacks = []
-        if strategy == "ddp":
+        if strategy in ["ddp", "ddp_find_unused_parameters_false"]:
             if self._problem_type != OBJECT_DETECTION:
                 raise NotImplementedError(f"inference using ddp is only implemented for {OBJECT_DETECTION}")
             else:
@@ -1790,7 +1790,7 @@ class MultiModalPredictor(ExportMixin):
                     return_predictions=not callbacks,
                 )
 
-                if strategy == "ddp":
+                if strategy in ["ddp", "ddp_find_unused_parameters_false"]:
                     if evaluator.global_rank != 0:
                         sys.exit(f"Prediction finished, exit the process with global_rank={evaluator.global_rank}...")
                     else:

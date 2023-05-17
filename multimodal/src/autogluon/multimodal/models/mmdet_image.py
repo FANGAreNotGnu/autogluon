@@ -368,7 +368,7 @@ class MMDetAutoModelForObjectDetection(nn.Module):
         """
         name_to_id = {}
         # for some models, use head lr in "head" of bbox_head
-        # now support: yolov3, faster_rcnn, deformable_detr, yolox, vfnet, centernet, cascade_rcnn, detr, htc, atss, ssd
+        # now support: yolov3, faster_rcnn, deformable_detr, yolox, vfnet, centernet, cascade_rcnn, detr, htc, atss, ssd, DINO
         registered_head_layers_patterns = [
             "bbox_head.fc_cls",
             "bbox_head.fc_reg",
@@ -381,6 +381,14 @@ class MMDetAutoModelForObjectDetection(nn.Module):
             "bbox_head.heatmap_head",
             "bbox_head.atss_cls",
             "bbox_head.cls_convs",
+            "model.decoder.layers.4",  # DINO
+            "model.decoder.layers.5",  # DINO
+            "model.decoder.ref_point_head",  # DINO
+            "model.decoder.norm",  # DINO
+            "model.query_embedding",  # DINO
+            "model.memory_trans_fc",  # DINO
+            "model.memory_trans_norm",  # DINO
+            "model.dn_query_generator",  # DINO
         ]
         # for other models, use head lr in whole bbox_head
         default_head_layers_patterns = ["bbox_head"]

@@ -192,13 +192,15 @@ def tutorial_script_for_finetune_high_performance_pothole_in_coco_format():
     val_path = os.path.join(data_dir, "Annotations", "usersplit_val_cocoformat.json")
     test_path = os.path.join(data_dir, "Annotations", "usersplit_test_cocoformat.json")
 
-    checkpoint_name = "vfnet_r50_fpn_mdconv_c3-c5_mstrain_2x_coco"
-    num_gpus = 1
+    # checkpoint_name = "dino-4scale_r50_8xb2-12e_coco.py"
+    checkpoint_name = "dino-5scale_swin-l_8xb2-36e_coco.py"
+    num_gpus = -1
 
     predictor = MultiModalPredictor(
         hyperparameters={
             "model.mmdet_image.checkpoint_name": checkpoint_name,
             "env.num_gpus": num_gpus,
+            "env.strategy": "ddp_find_unused_parameters_false",  # TODO: will be deprecated in future lightning release: https://github.com/Lightning-AI/lightning/pull/16611
             "optimization.val_metric": "map",
         },
         problem_type="object_detection",
@@ -210,9 +212,11 @@ def tutorial_script_for_finetune_high_performance_pothole_in_coco_format():
         train_path,
         tuning_data=val_path,
         hyperparameters={
-            "optimization.learning_rate": 5e-6,  # we use two stage and detection head has 100x lr
-            "optimization.max_epochs": 1,
-            "env.per_gpu_batch_size": 4,  # decrease it when model is large
+            "optimization.learning_rate": 1e-5,  # we use two stage and detection head has 100x lr
+            "optimization.patience": 3,
+            "optimization.max_epochs": 30,
+            "optimization.val_check_interval": 3.0,
+            "env.per_gpu_batch_size": 1,  # decrease it when model is large
         },
     )
     end = time.time()
@@ -220,16 +224,6 @@ def tutorial_script_for_finetune_high_performance_pothole_in_coco_format():
     print("This finetuning takes %.2f seconds." % (end - start))
 
     predictor.evaluate(test_path)
-
-    # Load Trained Predictor from S3
-    zip_file = "https://automl-mm-bench.s3.amazonaws.com/object_detection/checkpoints/pothole_AP50_718.zip"
-    download_dir = "./pothole_AP50_718"
-    load_zip.unzip(zip_file, unzip_dir=download_dir)
-    better_predictor = MultiModalPredictor.load("./pothole_AP50_718/AutogluonModels/ag-20221123_021130")
-    better_predictor.set_num_gpus(1)
-
-    # Evaluate new predictor
-    better_predictor.evaluate(test_path)
 
 
 def tutorial_script_for_finetune_high_performance_voc_in_coco_format():
@@ -334,4 +328,4 @@ def main():
 
 
 if __name__ == "__main__":
-    tutorial_script_for_finetune_yolox_pothole_in_coco_format()
+    tutorial_script_for_finetune_high_performance_pothole_in_coco_format()
