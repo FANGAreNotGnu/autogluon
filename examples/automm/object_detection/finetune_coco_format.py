@@ -203,6 +203,7 @@ def tutorial_script_for_finetune_high_performance_pothole_in_coco_format():
             "env.num_gpus": num_gpus,
             "env.strategy": "ddp_find_unused_parameters_false",  # TODO: will be deprecated in future lightning release: https://github.com/Lightning-AI/lightning/pull/16611
             "optimization.val_metric": "map",
+            "optimization.lr_choice": "freeze_backbone",
         },
         problem_type="object_detection",
         sample_data_path=train_path,
@@ -213,10 +214,10 @@ def tutorial_script_for_finetune_high_performance_pothole_in_coco_format():
         train_path,
         tuning_data=val_path,
         hyperparameters={
-            "optimization.learning_rate": 1e-5,  # we use two stage and detection head has 100x lr
-            "optimization.patience": 3,
-            "optimization.max_epochs": 30,
-            "optimization.val_check_interval": 3.0,
+            "optimization.learning_rate": 1e-4,  # we use two stage and detection head has 100x lr
+            "optimization.patience": 20,
+            "optimization.max_epochs": 50,
+            "optimization.val_check_interval": 1.0,
             "env.per_gpu_batch_size": 1,  # decrease it when model is large
         },
     )
