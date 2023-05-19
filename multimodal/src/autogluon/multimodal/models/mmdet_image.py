@@ -420,7 +420,8 @@ class MMDetAutoModelForObjectDetection(nn.Module):
     def get_backbone_layer_names(self):
         backbone_layer_names = []
         backbone_layers_patterns = [
-            "backbone",
+            "model.backbone",
+            "model.level_embed",
         ]
         for n, _ in self.named_parameters():
             if any(pattern in n for pattern in backbone_layers_patterns):

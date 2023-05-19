@@ -193,15 +193,16 @@ def tutorial_script_for_finetune_high_performance_pothole_in_coco_format():
     val_path = os.path.join(data_dir, "Annotations", "usersplit_val_cocoformat.json")
     test_path = os.path.join(data_dir, "Annotations", "usersplit_test_cocoformat.json")
 
-    # checkpoint_name = "dino-4scale_r50_8xb2-12e_coco.py"
-    checkpoint_name = "dino-5scale_swin-l_8xb2-36e_coco.py"
+    checkpoint_name = "dino-4scale_r50_8xb2-12e_coco.py"
+    # checkpoint_name = "dino-5scale_swin-l_8xb2-36e_coco.py"
     num_gpus = -1
 
     predictor = MultiModalPredictor(
         hyperparameters={
             "model.mmdet_image.checkpoint_name": checkpoint_name,
             "env.num_gpus": num_gpus,
-            "env.strategy": "ddp_find_unused_parameters_false",  # TODO: will be deprecated in future lightning release: https://github.com/Lightning-AI/lightning/pull/16611
+            # "env.strategy": "ddp_find_unused_parameters_false",  # TODO: will be deprecated in future lightning release: https://github.com/Lightning-AI/lightning/pull/16611
+            "env.strategy": "ddp",  # TODO: will be deprecated in future lightning release: https://github.com/Lightning-AI/lightning/pull/16611
             "optimization.val_metric": "map",
             "optimization.lr_choice": "freeze_backbone",
         },
@@ -218,6 +219,7 @@ def tutorial_script_for_finetune_high_performance_pothole_in_coco_format():
             "optimization.patience": 20,
             "optimization.max_epochs": 50,
             "optimization.val_check_interval": 1.0,
+            "optimization.check_val_every_n_epoch": 1,
             "env.per_gpu_batch_size": 1,  # decrease it when model is large
         },
     )
