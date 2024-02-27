@@ -163,10 +163,11 @@ class MultimodalFusionMLP(AbstractMultimodalFusionModel):
             multimodal_logits.append(per_output[per_model.prefix][LOGITS])
             offset += len(per_model.input_keys)
 
-        features = self.fusion_mlp(torch.cat(multimodal_features, dim=1))
+        multimodal_features = torch.cat(multimodal_features, dim=1)
+        features = self.fusion_mlp(multimodal_features)
         logits = self.head(features)
 
-        return features, logits, multimodal_logits
+        return multimodal_features, logits, multimodal_logits
 
     def get_output_dict(self, features: torch.Tensor, logits: torch.Tensor, multimodal_logits: List[torch.Tensor]):
         fusion_output = {

@@ -210,7 +210,7 @@ class MultimodalFusionTransformer(AbstractMultimodalFusionModel):
         fusion_output = {
             self.prefix: {
                 LOGITS: logits,
-                FEATURES: features,
+                FEATURES: multimodal_features,
             }
         }
         if self.loss_weight is not None:
