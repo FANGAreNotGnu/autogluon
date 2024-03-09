@@ -7,7 +7,7 @@ from autogluon.multimodal import MultiModalPredictor
 
 BENCH_ROOT = "/media/ag/data/AutoMLDetBench"
 
-def main(dataset_name, has_val, presets, lr_mult):
+def main(dataset_name, presets, seed):
     train_path = os.path.join(BENCH_ROOT, dataset_name, "annotations", "train_train.json")
     val_path = os.path.join(BENCH_ROOT, dataset_name, "annotations", "train_val.json")
     if not os.path.exists(val_path):
@@ -44,13 +44,10 @@ def main(dataset_name, has_val, presets, lr_mult):
 
     # Init predictor
     predictor = MultiModalPredictor(
-        #hyperparameters={"env.num_gpus": -1, "optimization.lr_mult": lr_mult},  # benchmarking on single GPU
-        hyperparameters=hyperparameters,  # benchmarking on single GPU
+        hyperparameters=hyperparameters,
         problem_type="object_detection",
         sample_data_path=train_path,
-        #path=f"./{dataset_name}_bench_lrm{lr_mult}",
-        path=f"./AutogluonModels/{dataset_name}_bench_{presets}_tune_{uuid.uuid4()}",
-        #path=f"./AutogluonModels/{dataset_name}_tune_{uuid.uuid4()}",
+        path=f"./AutogluonModels/{dataset_name}_bench_{presets}_seed_{seed}_tune_{uuid.uuid4()}",
         presets=presets,
     )
 
@@ -59,6 +56,7 @@ def main(dataset_name, has_val, presets, lr_mult):
     predictor.fit(
         train_path,
         tuning_data=val_path,
+        seed=seed,
     )
     train_end = time.time()
     print("The finetuning takes %.2f seconds." % (train_end - start))
@@ -70,13 +68,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--dataset_name", default=None, type=str)
     parser.add_argument("-p", "--presets", default="best_quality", type=str)
-    parser.add_argument("-v", "--has_val", action="store_true")
-    parser.add_argument("-m", "--lr_mult", default=100, type=int)
+    parser.add_argument("-s", "--seed", default=0, type=int)
     args = parser.parse_args()
 
     main(
         dataset_name=args.dataset_name,
         presets=args.presets,
-        has_val=args.has_val,
-        lr_mult=args.lr_mult,
+        seed=args.seed,
     )
