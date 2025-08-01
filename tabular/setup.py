@@ -47,7 +47,7 @@ extras_require = {
         "xgboost>=2.0,<3.1",  # <{N+1} upper cap, where N is the latest released minor version
     ],
     "realmlp": [
-        "pytabkit>=1.5,<1.6",
+        "pytabkit>=1.6,<1.7",
     ],
     "fastai": [
         "spacy<3.9",
@@ -73,6 +73,7 @@ extras_require = {
         "torch",
         "transformers",
         "huggingface_hub[torch]",
+        "einops>=0.7,<0.9",
     ],
     "tabicl": [
         "tabicl>=0.1.3,<0.2",  # 0.1.3 added a major bug fix to multithreading.
